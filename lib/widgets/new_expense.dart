@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'dart:io' show Platform;
 import 'package:expense_tracker/models/expense.dart'; 
+import 'package:flutter/cupertino.dart';
 
 class NewExpense extends StatefulWidget {     
   const NewExpense({super.key, required this.onAddExpense});
@@ -40,9 +41,11 @@ class _NewExpenseState extends State<NewExpense> {
     if (_titleController.text.trim().isEmpty ||    
         amountIsInvalid ||                      
         _selectedDate == null) {              
-      showDialog(                            
-        context: context,
-        builder: (ctx) => AlertDialog(      
+      if(Platform.isAndroid)
+      {
+       showDialog(                            
+          context: context,
+          builder: (ctx) => AlertDialog(      
           title: const Text('Invalid input'),         
           content: const Text(                       
               'Please make sure a valid title, amount, date and category was entered.'),
@@ -52,10 +55,29 @@ class _NewExpenseState extends State<NewExpense> {
                 Navigator.pop(ctx);
               },
               child: const Text('Okay'),   
-            ),
-          ],
-        ),
-      );
+             ),
+           ],
+         ),
+       );
+      }
+      else 
+      { showCupertinoDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(      
+          title: const Text('Invalid input'),         
+          content: const Text(                       
+              'Please make sure a valid title, amount, date and category was entered.'),
+          actions: [                  
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+              },
+              child: const Text('Okay'),   
+              ),
+            ],
+           ),
+         );
+       }
       return;
     }
     
@@ -79,8 +101,12 @@ class _NewExpenseState extends State<NewExpense> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),  
+    final keyboardSpace=MediaQuery.of(context).viewInsets.bottom;
+    return SizedBox(
+       height: double.infinity,
+      child:SingleChildScrollView(
+      child: Padding(
+      padding: EdgeInsets.fromLTRB(16, 48, 16,keyboardSpace+ 16),  
       child: Column(
         children: [
           TextField(       
